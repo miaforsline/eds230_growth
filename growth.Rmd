@@ -93,11 +93,27 @@ results = ode(initial_pop, time, forest_growth, parameters)
 
 # add more meaningful names
 colnames(results) = c("year","P")
-
-# plot
-ggplot(as.data.frame(results), aes(year,P))+geom_point()+labs(y="Population", "years")
 ```
 
+## Graph the results.
+
+```{r}
+ggplot(as.data.frame(results), aes(year,P)) + 
+  geom_point() + 
+  labs(y="Population", 
+       x = "Years") + 
+  geom_vline(xintercept = 50) 
+  theme_classic()
+```
+
+
+
+
+
+
+# 3. Run a sobol sensitivity analysis that explores how the estimated maximum and mean forest size (e.g maximum and mean values of C over the 300 years) varies with the pre canopy closure growth rate (*r*) and post-canopy closure growth rate (*g*) and canopy closure threshold and carrying capacity(*K*)
+
+Assume that parameters are all normally distributed with means as given above and standard deviation of 10% of mean value.
 
 ```{r}
 X1 = cbind.data.frame(C = C,
@@ -141,17 +157,6 @@ result = ode(y = pop,
              parms = parameters)
 
 head(result)
-```
-
-
-## Graph the results.
-
-# 3. Run a sobol sensitivity analysis that explores how the estimated maximum and mean forest size (e.g maximum and mean values of C over the 300 years) varies with the pre canopy closure growth rate (*r*) and post-canopy closure growth rate (*g*) and canopy closure threshold and carrying capacity(*K*)
-
-Assume that parameters are all normally distributed with means as given above and standard deviation of 10% of mean value.
-
-```{r}
-
 ```
 
 ## Graph the results of the sensitivity analysis as a box plot of maximum forest size and a plot of the two Sobol indices (S and T).
