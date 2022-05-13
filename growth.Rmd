@@ -100,9 +100,8 @@ colnames(results) = c("year","P")
 ```{r}
 ggplot(as.data.frame(results), aes(year,P)) + 
   geom_point() + 
-  labs(y="Population", 
-       x = "Years") + 
-  geom_vline(xintercept = 50) 
+  labs(y="Forest Population", 
+       x = "Years") +
   theme_classic()
 ```
 
