@@ -55,6 +55,8 @@ You can think of *r*, as early exponential growth rate and *g* as the linear gro
 # 1. Implement this model in R (as a differential equation)
 
 ```{r}
+source(here("R", "forest_growth.R"))
+
 
 ```
 
