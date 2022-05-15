@@ -77,8 +77,8 @@ C = 10 #forest size
 time = seq(from = 1, to = 300) #run the model for 300 years
 threshold = 50 #canopy closure 
 K = 250
-r = 0.01
-g = 2
+r = 0.01 #exponential growth rate
+g = 2 #linear growth rate 
 
 #create parameters list
 parms = list(time = time,
@@ -103,9 +103,8 @@ ggplot(as.data.frame(results), aes(year, P)) +
   geom_point() + 
   labs(y="Forest Population", 
        x = "Years") +
-  theme_classic()
-
-    geom_point(col = "darkgreen",
+  theme_classic() +
+geom_point(col = "darkgreen",
              size = 1) + 
   ggtitle(label = "Forest Population after 300 Years of Growth",
           subtitle = "") +
@@ -122,23 +121,86 @@ ggplot(as.data.frame(results), aes(year, P)) +
 Assume that parameters are all normally distributed with means as given above and standard deviation of 10% of mean value.
 
 ```{r}
+#set parameters 
+C = 10 #forest size
 
-C = 10 
+#number of samples 
+np = 100 
 
-np = 100
-r = rnorm(mean = 0.01, sd = 0.01*.10, n = np)
-g = rnorm(mean = 2, sd = 2*.10, n = np)
+#sample parameters from normal distributions 
+r_distribution = rnorm(mean = 0.01, sd = r*.10, n = np)
+g_distribution = rnorm(mean = 2, sd = g*.10, n = np)
+threshold_distribution = rnorm(mean = 50, sd = threshold*.10, n = np)
+K_distribution = rnorm(mean = 250, sd = K*.10, n = np)
+
+#create the first dataframe 
+X1 = cbind.data.frame(r = r_distribution, 
+                      g = g_distribution, 
+                      threshold = threshold_distribution, 
+                      K = K_distribution)
+
+#change the r, g, and K values 
+r = rnorm(mean = 0.02, sd = 0.01*.10, n = np)
+g = rnorm(mean = 3, sd = 2*.10, n = np)
 threshold = rnorm(mean = 50, sd = 50*.10, n = np)
-K = rnorm(mean = 250, sd = 250*.10, n = np)
-X1 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
+K = rnorm(mean = 300, sd = 250*.10, n = np)
 
-np = 100
-r = rnorm(mean = 0.01, sd = 0.01*.10, n = np)
-g = rnorm(mean = 2, sd = 2*.10, n = np)
-threshold = rnorm(mean = 50, sd = 50*.10, n = np)
-K = rnorm(mean = 250, sd = 250*.10, n = np)
+#create the second dataframe 
 X2 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
+```
 
+
+```{r}
+# create our sobel object and get sets ofparameters for running the model
+sens_P = sobolSalt(model = NULL,X1, X2, nboot = 300)
+
+colnames(sens_P$X) = c("r",
+                       "g",
+                       "threshold",
+                       "K")
+
+# our parameter sets are
+head(sens_P$X)
+```
+
+
+```{r}
+# define a wrapper function to do everything we need - run solver and compute metrics - and send back results for each parameter
+
+p_wrapper = function(r,carry_capacity, Pinitial, simtimes, func) {
+    parms = list(r = r,
+                 g = g,
+                 threshold = threshold,
+                 K = K)
+    result = ode(y=Pinitial, 
+                 times=simtimes, 
+                 func=func, 
+                 parms=parms) 
+    colnames(result)=c("time","P")
+  # get metrics
+  metrics=compute_metrics(as.data.frame(result))
+  return(metrics)
+}
+```
+
+
+```{r}
+#reiterate parameters 
+Pinitial = 10 #forest size (initial population in units of kgC)
+simtimes = seq(from = 1, to = 300) #run the model for 300 years
+func = forest_growth
+
+
+# now use pmap as we did before
+allresults = as.data.frame(sens_P$X) %>% 
+  pmap(p_wrapper, 
+       Pinitial=Pinitial, 
+       simtimes=simtimes, 
+       func=func)
+```
+
+
+```{r}
 # create our sobel object and get sets of parameters for running the model
 sens_P = sobolSalt(model = NULL, X1, X2, nboot = 300)
 
