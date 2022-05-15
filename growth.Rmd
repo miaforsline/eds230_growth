@@ -203,8 +203,10 @@ allresults = as.data.frame(sens_P$X) %>%
 ```{r}
 # extract out results from pmap into a data frame
 allres = allresults %>% map_dfr(`[`,c("maxpop","meanpop"))
+```
 
-
+## Graph the results 
+```{r}
 # create boxplots
 tmp = allres %>% gather(key="metric", value="value")
 ggplot(tmp, aes(metric, value, col=metric)) + 
@@ -212,91 +214,7 @@ ggplot(tmp, aes(metric, value, col=metric)) +
   theme_classic() 
 ```
 
-
-
-
-```{r}
-# create our sobel object and get sets of parameters for running the model
-sens_P = sobolSalt(model = NULL, X1, X2, nboot = 300)
-
-colnames(sens_P$X) = c("r",
-                       "g",
-                       "threshold",
-                       "K")
-
-head(sens_P$X) 
-
-# get results for 300 years
-simtimes = seq(from = 1, to = 300) 
-
-parms = list(r=as.data.frame(sens_P$X)$r[1], g=as.data.frame(sens_P$X)$g[1], threshold=as.data.frame(sens_P$X)$threshold[1], K=as.data.frame(sens_P$X)$K[1])
-
-result = ode(C, simtimes, forest_growth, parms)
-result = as.data.frame(result)
-
-```
-
-```{r}
-compute_metrics(result)
-```
-
-
-
-## Graph the results of the sensitivity analysis as a box plot of maximum forest size and a plot of the two Sobol indices (S and T).
-
-```{r}
-
-```
-
-# 4. In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
-
-
-
-```{r}
-# X1 = cbind.data.frame(C = C,
-#                       time = time,
-#                       threshold = threshold,
-#                       K = K,
-#                       r = r,
-#                       g = g)
-# 
-# X2 = cbind.data.frame(pop = pop,
-#                       time = time,
-#                       threshold = threshold,
-#                       K = K,
-#                       r = r,
-#                       g = g)
-# 
-# # create our sobel object and get sets ofparameters for running the model
-# sens_P = sobolSalt(model = NULL,X1, X2, nboot = 300)
-# colnames(sens_P$X) = c("pop",
-#                        "time",
-#                        "threshold", 
-#                        "carrying_capacity",
-#                        "exponential_growth",
-#                        "linear_growth")
-# 
-# #creat parameters
-# parameters = list(pop = sens_P$X[1,"pop"],
-#                   time = sens_P$X[1,"time"],
-#                   threshold = sens_P$X[1,"threshold"],
-#                   K = sens_P$X[1,"carrying_capacity"],
-#                   r = sens_P$X[1,"exponential_growth"], 
-#                   g = sens_P$X[1,"linear_growth"]
-#                   )
-```
-
-
-```{r}
-# result = ode(y = pop, 
-#              times = time, 
-#              func = forest_growth, 
-#              parms = parameters)
-# 
-# head(result)
-```
-
-
+# In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
 
 
 
