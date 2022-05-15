@@ -152,7 +152,7 @@ X2 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
 
 ```{r}
 # create our sobel object and get sets ofparameters for running the model
-sens_P = sobolSalt(model = NULL,X1, X2, nboot = 300)
+sens_P = sobolSalt(model = NULL, X1, X2, nboot = 300)
 
 colnames(sens_P$X) = c("r",
                        "g",
@@ -172,31 +172,30 @@ p_wrapper = function(r, g, threshold, K, Pinitial, simtimes, func) {
                  g = g,
                  threshold = threshold,
                  K = K)
-    result = ode(y=Pinitial, 
-                 times=simtimes, 
-                 func=func, 
-                 parms=parms) 
-    colnames(result)=c("time","P")
+    result = ode(y = Pinitial, 
+                 times = simtimes, 
+                 func = func, 
+                 parms = parms) 
+    colnames(result) = c("time","P")
   # get metrics
-  metrics=compute_metrics(as.data.frame(result))
+  metrics = compute_metrics(as.data.frame(result))
   return(metrics)
 }
 ```
 
 
 ```{r}
-#reiterate parameters 
-Pinitial = 10 #forest size (initial population in units of kgC)
+# reiterate parameters 
+Pinitial = 10 #forest size (initial population in units of kg C)
 simtimes = seq(from = 1, to = 300) #run the model for 300 years
 func = forest_growth
-
 
 # now use pmap as we did before
 allresults = as.data.frame(sens_P$X) %>% 
   pmap(p_wrapper, 
-       Pinitial=Pinitial, 
-       simtimes=simtimes, 
-       func=func)
+       Pinitial = Pinitial, 
+       simtimes = simtimes, 
+       func = func)
 ```
 
 
@@ -205,13 +204,43 @@ allresults = as.data.frame(sens_P$X) %>%
 allres = allresults %>% map_dfr(`[`,c("maxpop","meanpop"))
 ```
 
+
 ## Graph the results 
 ```{r}
 # create boxplots
-tmp = allres %>% gather(key="metric", value="value")
-ggplot(tmp, aes(metric, value, col=metric)) + 
+tmp = allres %>% gather(key = "metric", value = "value")
+ggplot(tmp, aes(metric, value, col = metric)) + 
   geom_boxplot() + 
   theme_classic() 
+```
+
+
+
+```{r}
+# graph of sobol results as box plot of max forest size and a plot of the two sobol indices (S and T)
+
+ggplot(data = allres,
+       aes(y = maxpop)) + 
+  geom_boxplot() + 
+  theme_classic() 
+
+# compute the sobol indices for maxpop
+sens_P_maxpop = sensitivity::tell(sens_P, allres$maxpop)
+
+# first-order indices (main effect without co-variance)
+sens_P_maxpop$S
+
+# total sensitivity index 
+sens_P_maxpop$T
+
+# compute the sobol indices for meanpop
+sens_P_meanpop = sensitivity::tell(sens_P, allres$meanpop)
+
+# first order indices
+sens_P_meanpop$S
+
+# total sensitivity index
+sens_P_meanpop$T
 ```
 
 # In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
