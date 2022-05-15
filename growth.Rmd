@@ -167,7 +167,7 @@ head(sens_P$X)
 ```{r}
 # define a wrapper function to do everything we need - run solver and compute metrics - and send back results for each parameter
 
-p_wrapper = function(r,carry_capacity, Pinitial, simtimes, func) {
+p_wrapper = function(r, g, threshold, K, Pinitial, simtimes, func) {
     parms = list(r = r,
                  g = g,
                  threshold = threshold,
@@ -198,6 +198,21 @@ allresults = as.data.frame(sens_P$X) %>%
        simtimes=simtimes, 
        func=func)
 ```
+
+
+```{r}
+# extract out results from pmap into a data frame
+allres = allresults %>% map_dfr(`[`,c("maxpop","meanpop"))
+
+
+# create boxplots
+tmp = allres %>% gather(key="metric", value="value")
+ggplot(tmp, aes(metric, value, col=metric)) + 
+  geom_boxplot() + 
+  theme_classic() 
+```
+
+
 
 
 ```{r}
