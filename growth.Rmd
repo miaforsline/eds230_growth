@@ -1,0 +1,226 @@
+---
+title: "EDS 230/ESM 232 Growth Model Assignment"
+author: "Genevieve Chiong, Halina Do-Linh, Mia Forsline"
+date: '2022-05-19'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Set up
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE, 
+                      warning = FALSE)
+
+#install packages if necessary, then load libraries
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+
+librarian::shelf(
+  deSolve,
+  here,
+  sensitivity,
+  tidyverse)
+```
+
+# Introduction
+
+Consider the following model of forest growth (where forest size in measured in units of carbon (C)):
+
+-   dC/dt = r ∗ C for forests
+
+    -   where C is below a threshold canopy closure
+
+    -   and *r* is the early exponential growth rate
+
+-   dC/dt = g ∗ (1−C/K) for forests
+
+    -   where C is at or above the threshold canopy closure
+
+    -   and *g* is the linear growth rate
+
+-   and *K* is a carrying capacity in units of carbon.
+
+The size of the forest (C), canopy closure threshold, and carrying capacity (K) are all in units of carbon.
+
+You could think of the canopy closure threshold as the size of the forest at which growth rates change from exponential to linear.
+
+You can think of *r*, as early exponential growth rate and *g* as the linear growth rate once canopy closure has been reached
+
+# 1. Implement this model in R (as a differential equation)
+
+```{r}
+source(here("R", "forest_growth.R"))
+source(here("R", "compute_metrics.R"))
+
+forest_growth
+compute_metrics
+```
+
+# 2. Run the model for 300 years (using the ODE solver) starting with an initial forest size of 10 kg/C, and using the following parameters:
+
+-   canopy closure threshold of 50 kgC
+
+-   *K* = 250 kg C (carrying capacity)
+
+-   *r* = 0.01 (exponential growth rate before before canopy closure)
+
+-   *g* = 2 kg/year (linear growth rate after canopy closure)
+
+```{r}
+#set up parameters 
+C = 10 #forest size
+time = seq(from = 1, to = 300) #run the model for 300 years
+threshold = 50 #canopy closure 
+K = 250
+r = 0.01
+g = 2
+
+#create parameters list
+parms = list(time = time,
+             threshold = threshold,
+             K = K,
+             r = r,
+             g = g)
+
+#apply solver - we input the differential equation and the ODE solver integrates it 
+results = ode(C, time, forest_growth, parms)
+
+head(results)
+
+# add more meaningful names
+colnames(results) = c("year","P")
+```
+
+## Graph the results.
+
+```{r}
+ggplot(as.data.frame(results), aes(year, P)) + 
+  geom_point() + 
+  labs(y="Forest Population", 
+       x = "Years") +
+  theme_classic()
+
+    geom_point(col = "darkgreen",
+             size = 1) + 
+  ggtitle(label = "Forest Population after 300 Years of Growth",
+          subtitle = "") +
+  labs(y ="Population", 
+       x = "Years") + 
+  geom_vline(xintercept = 50) +
+  theme_classic() +
+  scale_x_continuous(breaks = seq(0, 300, by = 25)) +
+  scale_y_continuous(breaks = seq(0, 200, by = 25))
+```
+
+# 3. Run a sobol sensitivity analysis that explores how the estimated maximum and mean forest size (e.g maximum and mean values of C over the 300 years) varies with the pre canopy closure growth rate (*r*) and post-canopy closure growth rate (*g*) and canopy closure threshold and carrying capacity(*K*)
+
+Assume that parameters are all normally distributed with means as given above and standard deviation of 10% of mean value.
+
+```{r}
+
+C = 10 
+
+np = 100
+r = rnorm(mean = 0.01, sd = 0.01*.10, n = np)
+g = rnorm(mean = 2, sd = 2*.10, n = np)
+threshold = rnorm(mean = 50, sd = 50*.10, n = np)
+K = rnorm(mean = 250, sd = 250*.10, n = np)
+X1 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
+
+np = 100
+r = rnorm(mean = 0.01, sd = 0.01*.10, n = np)
+g = rnorm(mean = 2, sd = 2*.10, n = np)
+threshold = rnorm(mean = 50, sd = 50*.10, n = np)
+K = rnorm(mean = 250, sd = 250*.10, n = np)
+X2 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
+
+# create our sobel object and get sets of parameters for running the model
+sens_P = sobolSalt(model = NULL, X1, X2, nboot = 300)
+
+colnames(sens_P$X) = c("r",
+                       "g",
+                       "threshold",
+                       "K")
+
+head(sens_P$X) 
+
+# get results for 300 years
+simtimes = seq(from = 1, to = 300) 
+
+parms = list(r=as.data.frame(sens_P$X)$r[1], g=as.data.frame(sens_P$X)$g[1], threshold=as.data.frame(sens_P$X)$threshold[1], K=as.data.frame(sens_P$X)$K[1])
+
+result = ode(C, simtimes, forest_growth, parms)
+result = as.data.frame(result)
+
+```
+
+```{r}
+compute_metrics(result)
+```
+
+
+
+## Graph the results of the sensitivity analysis as a box plot of maximum forest size and a plot of the two Sobol indices (S and T).
+
+```{r}
+
+```
+
+# 4. In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
+
+
+
+```{r}
+# X1 = cbind.data.frame(C = C,
+#                       time = time,
+#                       threshold = threshold,
+#                       K = K,
+#                       r = r,
+#                       g = g)
+# 
+# X2 = cbind.data.frame(pop = pop,
+#                       time = time,
+#                       threshold = threshold,
+#                       K = K,
+#                       r = r,
+#                       g = g)
+# 
+# # create our sobel object and get sets ofparameters for running the model
+# sens_P = sobolSalt(model = NULL,X1, X2, nboot = 300)
+# colnames(sens_P$X) = c("pop",
+#                        "time",
+#                        "threshold", 
+#                        "carrying_capacity",
+#                        "exponential_growth",
+#                        "linear_growth")
+# 
+# #creat parameters
+# parameters = list(pop = sens_P$X[1,"pop"],
+#                   time = sens_P$X[1,"time"],
+#                   threshold = sens_P$X[1,"threshold"],
+#                   K = sens_P$X[1,"carrying_capacity"],
+#                   r = sens_P$X[1,"exponential_growth"], 
+#                   g = sens_P$X[1,"linear_growth"]
+#                   )
+```
+
+
+```{r}
+# result = ode(y = pop, 
+#              times = time, 
+#              func = forest_growth, 
+#              parms = parameters)
+# 
+# head(result)
+```
+
+
+
+
+
+
