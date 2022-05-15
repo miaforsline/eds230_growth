@@ -1,22 +1,23 @@
 #'  More complex population growth
 #' @param time  period of growth
-#' @param pop initial population
-#' @param parameters$r - exponential growth rate
-#' @param parameters$g - linear growth rate
-#' @parms parameters$K - carrying capacity in units of carbon 
-#' @parms parameters$C - forest size measured in units of carbon 
-#' @parms parameters$threshold - threshold canopy closure in units of carbon
+#' @param r exponential growth rate
+#' @param g linear growth rate
+#' @param K carrying capacity in units of carbon 
+#' @param C forest size measured in units of carbon 
+#' @param threshold threshold canopy closure in units of carbon
+#' @param parms as list with six values C, time, threshold, K, r, g 
 #' @return change in population
-#'
-forest_growth = function(time, pop, parameters) {
+
+
+forest_growth = function(time, C, parms) {
   
   #C is below a threshold canopy closure
-  if(parameters$C < parameters$threshold){
-    dC_dt = parameters$r * parameters$C
+  if(C < parms$threshold){
+    dC_dt = parms$r * C
   }
   #C is above a threshold canopy closure
   else{
-    dC_dt = parameters$g * (1 - (parameters$C / parameters$K))
+    dC_dt = parms$g * (1 - (C / parms$K))
   }
   
   return(list(dC_dt))
