@@ -127,11 +127,11 @@ C = 10 #forest size
 #number of samples 
 np = 100 
 
-#sample parameters from normal distributions 
-r_distribution = rnorm(mean = 0.01, sd = r*.10, n = np)
-g_distribution = rnorm(mean = 2, sd = g*.10, n = np)
-threshold_distribution = rnorm(mean = 50, sd = threshold*.10, n = np)
-K_distribution = rnorm(mean = 250, sd = K*.10, n = np)
+#create first sample parameters from normal distributions 
+r = rnorm(mean = 0.01, sd = r*.10, n = np)
+g = rnorm(mean = 2, sd = g*.10, n = np)
+threshold = rnorm(mean = 50, sd = threshold*.10, n = np)
+K = rnorm(mean = 250, sd = K*.10, n = np)
 
 #create the first dataframe 
 X1 = cbind.data.frame(r = r_distribution, 
@@ -139,11 +139,11 @@ X1 = cbind.data.frame(r = r_distribution,
                       threshold = threshold_distribution, 
                       K = K_distribution)
 
-#change the r, g, and K values 
-r = rnorm(mean = 0.02, sd = 0.01*.10, n = np)
-g = rnorm(mean = 3, sd = 2*.10, n = np)
-threshold = rnorm(mean = 50, sd = 50*.10, n = np)
-K = rnorm(mean = 300, sd = 250*.10, n = np)
+#create second sample parameters from normal distributions (this is just how sobol works)
+r = rnorm(mean = 0.01, sd = r*.10, n = np)
+g = rnorm(mean = 2, sd = g*.10, n = np)
+threshold = rnorm(mean = 50, sd = threshold*.10, n = np)
+K = rnorm(mean = 250, sd = K*.10, n = np)
 
 #create the second dataframe 
 X2 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
@@ -245,6 +245,10 @@ sens_P_meanpop$T
 
 # In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
 
-
+plot bar chart (y is categories, sobol score is x axis)
+two plots (t = total, s = first order)
+mean and max of s and t
+x1, x2, x3, x4 are the parameters and are the names we called it in our scripts
+closer it is 1, the more influential it is 
 
 
