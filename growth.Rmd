@@ -134,10 +134,7 @@ threshold = rnorm(mean = 50, sd = threshold*.10, n = np)
 K = rnorm(mean = 250, sd = K*.10, n = np)
 
 #create the first dataframe 
-X1 = cbind.data.frame(r = r_distribution, 
-                      g = g_distribution, 
-                      threshold = threshold_distribution, 
-                      K = K_distribution)
+X1 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
 
 #create second sample parameters from normal distributions (this is just how sobol works)
 r = rnorm(mean = 0.01, sd = r*.10, n = np)
@@ -151,7 +148,7 @@ X2 = cbind.data.frame(r = r, g = g, threshold = threshold, K = K)
 
 
 ```{r}
-# create our sobel object and get sets ofparameters for running the model
+#create our sobel object and get sets of parameters for running the model
 sens_P = sobolSalt(model = NULL, X1, X2, nboot = 300)
 
 colnames(sens_P$X) = c("r",
@@ -159,7 +156,7 @@ colnames(sens_P$X) = c("r",
                        "threshold",
                        "K")
 
-# our parameter sets are
+#our parameter sets are
 head(sens_P$X)
 ```
 
@@ -213,12 +210,10 @@ ggplot(tmp, aes(metric, value, col = metric)) +
   geom_boxplot() + 
   theme_classic() 
 ```
-
-
+### Graphs of sobol indices (S and T)
 
 ```{r}
 # graph of sobol results as box plot of max forest size and a plot of the two sobol indices (S and T)
-
 ggplot(data = allres,
        aes(y = maxpop)) + 
   geom_boxplot() + 
@@ -243,12 +238,62 @@ sens_P_meanpop$S
 sens_P_meanpop$T
 ```
 
-# In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
 
 plot bar chart (y is categories, sobol score is x axis)
 two plots (t = total, s = first order)
-mean and max of s and t
-x1, x2, x3, x4 are the parameters and are the names we called it in our scripts
+mean and max of s and t (4 plots)
+x1 (r), x2 (g), x3 (threshold), x4 (K) are the parameters and are the names we called it in our scripts
 closer it is 1, the more influential it is 
 
+```{r}
+# creating df of max T
+max_T <- as.data.frame(sens_P_maxpop$T) 
 
+max_T <- max_T %>% 
+  rowid_to_column(var = "parameter")
+
+max_T[1,1] <- "r"
+max_T[2,1] <- "g"
+max_T[3,1] <- "threshold"
+max_T[4,1] <- "K"
+
+# creating df of max S
+max_S <- as.data.frame(sens_P_maxpop$S) 
+
+max_S <- max_S %>% 
+  rowid_to_column(var = "parameter")
+
+max_S[1,1] <- "r"
+max_S[2,1] <- "g"
+max_S[3,1] <- "threshold"
+max_S[4,1] <- "K"
+
+# creating df of mean T
+mean_T <- as.data.frame(sens_P_meanpop$T) 
+
+mean_T <- mean_T %>% 
+  rowid_to_column(var = "parameter")
+
+mean_T[1,1] <- "r"
+mean_T[2,1] <- "g"
+mean_T[3,1] <- "threshold"
+mean_T[4,1] <- "K"
+
+# creating df of mean S
+mean_S <- as.data.frame(sens_P_meanpop$S) 
+
+mean_S <- mean_S %>% 
+  rowid_to_column(var = "parameter")
+
+mean_S[1,1] <- "r"
+mean_S[2,1] <- "g"
+mean_S[3,1] <- "threshold"
+mean_S[4,1] <- "K"
+```
+
+
+```{r}
+
+```
+
+# In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
