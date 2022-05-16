@@ -24,7 +24,8 @@ librarian::shelf(
   deSolve,
   here,
   sensitivity,
-  tidyverse)
+  tidyverse,
+  patchwork)
 ```
 
 # Introduction
@@ -239,12 +240,6 @@ sens_P_meanpop$T
 ```
 
 
-plot bar chart (y is categories, sobol score is x axis)
-two plots (t = total, s = first order)
-mean and max of s and t (4 plots)
-x1 (r), x2 (g), x3 (threshold), x4 (K) are the parameters and are the names we called it in our scripts
-closer it is 1, the more influential it is 
-
 ```{r}
 # creating df of max T
 max_T <- as.data.frame(sens_P_maxpop$T) 
@@ -291,9 +286,46 @@ mean_S[3,1] <- "threshold"
 mean_S[4,1] <- "K"
 ```
 
+plot bar chart (y is categories, sobol score is x axis)
+two plots (t = total, s = first order)
+mean and max of s and t (4 plots)
+x1 (r), x2 (g), x3 (threshold), x4 (K) are the parameters and are the names we called it in our scripts
+closer it is 1, the more influential it is 
 
 ```{r}
+# create S and T plots
+max_T_plot <- ggplot(max_T, aes(x = original, y = parameter)) +
+  geom_col(fill = "darkgreen") +
+  theme_classic() +
+  labs(title = "Max Total Sensitivity Index",
+       x = "Sobol Score",
+       y = "Parameter")
 
+max_S_plot <- ggplot(max_S, aes(x = original, y = parameter)) +
+  geom_col(fill = "cyan4") +
+  theme_classic() +
+  labs(title = "Max First Order Sensitivity Index",
+       x = "Sobol Score",
+       y = "Parameter")
+
+mean_T_plot <- ggplot(mean_T, aes(x = original, y = parameter)) +
+  geom_col(fill = "darkgreen") +
+  theme_classic() +
+  labs(title = "Mean Total Sensitivity Index",
+       x = "Sobol Score",
+       y = "Parameter")
+
+mean_S_plot <- ggplot(mean_S, aes(x = original, y = parameter)) +
+  geom_col(fill = "cyan4") +
+  theme_classic() +
+  labs(title = "Mean First Order Sensitivity Index",
+       x = "Sobol Score",
+       y = "Parameter")
+
+# patchwork plots
+max_T_plot + max_S_plot
+
+mean_T_plot + mean_S_plot
 ```
 
 # In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
