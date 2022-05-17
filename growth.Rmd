@@ -316,3 +316,4 @@ mean_T_plot + mean_S_plot
 # In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
 
 closer it is 1, the more influential it is 
+
