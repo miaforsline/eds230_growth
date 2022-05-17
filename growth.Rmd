@@ -32,13 +32,13 @@ librarian::shelf(
 
 Consider the following model of forest growth (where forest size in measured in units of carbon (C)):
 
--   dC/dt = r ∗ C for forests
+-   dC/dt = r x C for forests
 
     -   where C is below a threshold canopy closure
 
     -   and *r* is the early exponential growth rate
 
--   dC/dt = g ∗ (1−C/K) for forests
+-   dC/dt = g x (1-C/K) for forests
 
     -   where C is at or above the threshold canopy closure
 
@@ -97,7 +97,7 @@ head(results)
 colnames(results) = c("year","P")
 ```
 
-## Graph the results.
+## Graph the results
 
 ```{r}
 ggplot(as.data.frame(results), aes(year, P)) + 
@@ -107,9 +107,9 @@ ggplot(as.data.frame(results), aes(year, P)) +
   theme_classic() +
 geom_point(col = "darkgreen",
              size = 1) + 
-  ggtitle(label = "Forest Population after 300 Years of Growth",
+  ggtitle(label = "Forest Growth after 300 Years of Growth",
           subtitle = "") +
-  labs(y ="Population", 
+  labs(y ="Forest Size", 
        x = "Years") + 
   geom_vline(xintercept = 50) +
   theme_classic() +
@@ -163,7 +163,8 @@ head(sens_P$X)
 
 
 ```{r}
-# define a wrapper function to do everything we need - run solver and compute metrics - and send back results for each parameter
+# define a wrapper function to do everything we need
+# run solver and compute metrics - and send back results for each parameter
 
 p_wrapper = function(r, g, threshold, K, Pinitial, simtimes, func) {
     parms = list(r = r,
@@ -211,7 +212,7 @@ ggplot(tmp, aes(metric, value, col = metric)) +
   geom_boxplot() + 
   theme_classic() 
 ```
-### Graphs of sobol indices (S and T)
+## Graphs of sobol indices (S and T)
 
 ```{r}
 # graph of sobol results as box plot of max forest size and a plot of the two sobol indices (S and T)
