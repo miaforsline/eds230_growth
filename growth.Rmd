@@ -111,7 +111,6 @@ geom_point(col = "darkgreen",
           subtitle = "") +
   labs(y ="Forest Size", 
        x = "Years") + 
-  geom_vline(xintercept = 50) +
   theme_classic() +
   scale_x_continuous(breaks = seq(0, 300, by = 25)) +
   scale_y_continuous(breaks = seq(0, 200, by = 25))
@@ -212,18 +211,11 @@ ggplot(tmp, aes(metric, value, col = metric)) +
   geom_boxplot() + 
   theme_classic() 
 ```
-## Graphs of sobol indices (S and T)
+
 
 ```{r}
-# graph of sobol results as box plot of max forest size and a plot of the two sobol indices (S and T)
-ggplot(data = allres,
-       aes(y = maxpop)) + 
-  geom_boxplot() + 
-  theme_classic() 
-
 # compute the sobol indices for maxpop
 sens_P_maxpop = sensitivity::tell(sens_P, allres$maxpop)
-
 # compute the sobol indices for meanpop
 sens_P_meanpop = sensitivity::tell(sens_P, allres$meanpop)
 ```
@@ -315,5 +307,6 @@ mean_T_plot + mean_S_plot
 
 # In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
 
-closer it is 1, the more influential it is 
+The results of our simulation show that the exponential growth rate (r) and the carrying capacity (K) are the most influential parameters for max forest population. Whereas the exponential growth rate (r) was the single most significant parameter for mean forest population. However, climate change might influence certain parameters. Due to warmer temperatures lasting longer periods of time, trees may have a longer growing season, with more time to photosynthesize. This can lead to increased forest growth and carbon sequestration. However, recent research has also found that trees are growing faster but dying earlier, which regresses their capacity to store carbon emissions. 
+
 
