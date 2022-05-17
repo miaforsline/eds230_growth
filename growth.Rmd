@@ -223,20 +223,8 @@ ggplot(data = allres,
 # compute the sobol indices for maxpop
 sens_P_maxpop = sensitivity::tell(sens_P, allres$maxpop)
 
-# first-order indices (main effect without co-variance)
-sens_P_maxpop$S
-
-# total sensitivity index 
-sens_P_maxpop$T
-
 # compute the sobol indices for meanpop
 sens_P_meanpop = sensitivity::tell(sens_P, allres$meanpop)
-
-# first order indices
-sens_P_meanpop$S
-
-# total sensitivity index
-sens_P_meanpop$T
 ```
 
 
@@ -286,11 +274,7 @@ mean_S[3,1] <- "threshold"
 mean_S[4,1] <- "K"
 ```
 
-plot bar chart (y is categories, sobol score is x axis)
-two plots (t = total, s = first order)
-mean and max of s and t (4 plots)
-x1 (r), x2 (g), x3 (threshold), x4 (K) are the parameters and are the names we called it in our scripts
-closer it is 1, the more influential it is 
+
 
 ```{r}
 # create S and T plots
@@ -329,3 +313,5 @@ mean_T_plot + mean_S_plot
 ```
 
 # In 2-3 sentences, discuss what the results of your simulation might mean for climate change impacts on forest growth (e.g think about what parameters climate change might influence ).
+
+closer it is 1, the more influential it is 
